@@ -2,64 +2,7 @@
 @section('title','Pendaftaran Berhasil!')
 @section('content')
 
-{{-- QRIS Payment Modal --}}
-@if($registration->payment_status === 'pending' && !$registration->whatsapp_confirmed_at)
-<div id="qrisModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-2xl width-full max-w-md p-8 text-center">
-    <h2 class="text-2xl font-bold text-slate-900 mb-2">Lakukan Pembayaran</h2>
-    <p class="text-slate-500 text-sm mb-6">Scan QRIS di bawah menggunakan aplikasi pembayaran mobile</p>
 
-    {{-- QRIS Code Display --}}
-    <div class="bg-slate-50 rounded-xl p-6 mb-6 flex justify-center">
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data={{ urlencode('QRIS-' . $registration->invoice_number) }}" alt="QRIS Code" class="w-48 h-48">
-    </div>
-
-    {{-- Timer --}}
-    <div class="mb-4 px-4 py-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-      <p class="text-xs text-yellow-700 font-semibold">Waktu tersisa:</p>
-      <p class="text-2xl font-black text-yellow-600"><span id="qrisTimer">10:00</span></p>
-      <p class="text-xs text-yellow-600 mt-1">Halaman akan refresh otomatis setelah waktu habis</p>
-    </div>
-
-    {{-- WhatsApp Confirmation --}}
-    <form action="{{ route('checkout.confirm-payment', $registration->invoice_number) }}" method="POST" class="mb-3">
-      @csrf
-      <button type="submit" class="w-full flex items-center justify-center gap-2 px-5 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors">
-        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.67-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421-7.403h-.004a9.87 9.87 0 00-4.946 1.23l-.356.214-3.71-.973.992 3.63-.235.364a9.864 9.864 0 001.516 5.163c.732 1.23 1.91 2.44 3.315 3.204 1.405.765 2.93 1.178 4.455 1.178h.005c4.937 0 8.945-4.027 8.945-8.973 0-2.396-.928-4.665-2.605-6.364-1.677-1.699-3.904-2.634-6.264-2.634z"/>
-        </svg>
-        Sudah Bayar? Konfirmasi via WhatsApp
-      </button>
-    </form>
-
-    <p class="text-xs text-slate-500">Dengan mengklik tombol di atas, Anda mengkonfirmasi bahwa pembayaran sudah dilakukan. Admin akan segera memverifikasi pembayaran Anda.</p>
-  </div>
-</div>
-
-<script>
-  (function() {
-    const QRIS_DURATION = 10 * 60; // 10 minutes in seconds
-    let timeRemaining = QRIS_DURATION;
-
-    function updateTimer() {
-      const minutes = Math.floor(timeRemaining / 60);
-      const seconds = timeRemaining % 60;
-      document.getElementById('qrisTimer').textContent = 
-        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-
-      if (timeRemaining <= 0) {
-        // Force page refresh after time expires
-        location.reload();
-      } else {
-        timeRemaining--;
-        setTimeout(updateTimer, 1000);
-      }
-    }
-
-    updateTimer();
-  })();
-</script>
-@endif
 
 <div class="max-w-2xl mx-auto px-4 py-10">
 

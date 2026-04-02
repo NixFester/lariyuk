@@ -21,12 +21,15 @@
 
     function addPaymentToList(registration) {
       let payments = getPaymentsList();
-      // Check if payment already exists
-      const exists = payments.some(p => p.invoice === registration.invoice);
-      if (!exists) {
+      // Check if this exact invoice already exists
+      const invoiceExists = payments.some(p => p.invoice === registration.invoice);
+      if (!invoiceExists) {
+        // Only add if this invoice doesn't already exist
         payments.unshift({
           id: registration.id,
-          invoice: registration.invoice
+          invoice: registration.invoice,
+          addedAt: new Date().toISOString(),
+          status: payment.status,
         });
         localStorage.setItem('lariyuk_payments', JSON.stringify(payments));
       }

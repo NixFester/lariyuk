@@ -120,12 +120,15 @@
 
     function addPayment(registration) {
       let payments = getPaymentsList();
-      // Check if payment already exists
-      const exists = payments.some(p => p.invoice === registration.invoice_number);
-      if (!exists) {
+      // Check if this exact invoice already exists
+      const invoiceExists = payments.some(p => p.invoice === registration.invoice_number);
+      if (!invoiceExists) {
+        // Only add if this invoice doesn't already exist
         payments.unshift({
           id: registration.id,
-          invoice: registration.invoice_number
+          invoice: registration.invoice_number,
+          addedAt: new Date().toISOString(),
+          status: registration.payment_status,
         });
         localStorage.setItem('lariyuk_payments', JSON.stringify(payments));
       }
@@ -234,6 +237,7 @@
     function openNotificationModal() {
       const modal = document.getElementById('notificationModal');
       const content = document.getElementById('notificationContent');
+      const paymentGateway = {!! json_encode(config('payment.gateway')) !!}.trim();
       gPayments = getPaymentsList();
       
       if (gPayments.length === 0) return;
@@ -242,6 +246,19 @@
       
       // Show all stored payments
       gPayments.forEach((payment, idx) => {
+        // Determine the correct URL based on global payment gateway setting
+        let statusUrl = '/checkout/pending/' + payment.invoice;
+        if (payment.status === 'paid') {
+          statusUrl = '/checkout/success/' + payment.invoice;
+        } else {
+          if (paymentGateway === 'midtrans') {
+            statusUrl = '/checkout/midtrans/initiate/' + payment.invoice;
+          } else if (paymentGateway === 'ipaymu') {
+            statusUrl = '/checkout/ipaymu/initiate/' + payment.invoice;
+          }
+        }
+        console.log('Payment Gateway:', paymentGateway, 'URL:', statusUrl);
+        
         html += `
           <div class="mb-4 p-4 rounded-lg border border-gray-200 bg-gray-50">
             <div class="flex items-center justify-between mb-3">
@@ -255,7 +272,7 @@
                 </svg>
               </button>
             </div>
-            <a href="/checkout/pending/${payment.invoice}" class="inline-block px-3 py-1.5 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+            <a href="${statusUrl}" class="inline-block px-3 py-1.5 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
               Lihat Status Pembayaran
             </a>
           </div>

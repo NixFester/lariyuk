@@ -3,6 +3,43 @@
 @section('content')
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-12">
     <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        {{-- Auto-store payment in localStorage --}}
+        <script>
+          // Store this payment to localStorage list
+          function getPaymentsList() {
+            const stored = localStorage.getItem('lariyuk_payments');
+            if (stored) {
+              try {
+                return JSON.parse(stored);
+              } catch (e) {
+                return [];
+              }
+            }
+            return [];
+          }
+
+          function addPaymentToList(registration) {
+            let payments = getPaymentsList();
+            // Check if this exact invoice already exists
+            const invoiceExists = payments.some(p => p.invoice === registration.invoice);
+            if (!invoiceExists) {
+              // Only add if this invoice doesn't already exist
+              payments.unshift({
+                id: registration.id,
+                invoice: registration.invoice,
+                addedAt: new Date().toISOString()
+              });
+              localStorage.setItem('lariyuk_payments', JSON.stringify(payments));
+            }
+          }
+
+          // Add this registration to payments list
+          addPaymentToList({
+            id: {{ $registration->id }},
+            invoice: '{{ $registration->invoice_number }}'
+          });
+        </script>
+
         <!-- Header -->
         <div class="text-center mb-8">
             <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">

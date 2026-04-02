@@ -86,9 +86,9 @@ class RegistrationController extends Controller
         // ── TICKET EMAIL (TEST MODE) ─────────────────────────────────────
         // In .env set MAIL_MAILER=log to "send" to storage/logs/laravel.log
         // Change to MAIL_MAILER=smtp + real credentials to send real emails.
-        // NOTE: For IPaymu flow, ticket is sent after payment confirmation.
+        // NOTE: For IPaymu & Midtrans flow, ticket is sent after payment confirmation.
         // For classic flow, ticket is sent here (can be changed to post-verification)
-        if (config('payment.gateway') !== 'ipaymu') {
+        if (!in_array(config('payment.gateway'), ['ipaymu', 'midtrans'])) {
             try {
                 Mail::to($registration->email)->send(new TicketMail($registration));
                 $registration->update(['ticket_email_sent' => true]);
@@ -136,6 +136,11 @@ class RegistrationController extends Controller
         if ($gateway === 'ipaymu') {
             Log::info('Routing to IPaymu', ['invoice' => $registration->invoice_number]);
             return redirect()->route('checkout.ipaymu.initiate', $registration->invoice_number);
+        }
+
+        if ($gateway === 'midtrans') {
+            Log::info('Routing to Midtrans', ['invoice' => $registration->invoice_number]);
+            return redirect()->route('checkout.midtrans.initiate', $registration->invoice_number);
         }
 
         Log::info('Routing to classic', ['invoice' => $registration->invoice_number]);
@@ -196,6 +201,24 @@ class RegistrationController extends Controller
     {
         $registration = Registration::with(['event', 'category'])
             ->where('invoice_number', $invoice)->firstOrFail();
+        
+
+        return view('checkout.success', compact('registration'));
+    }
+
+    //**workaround from midtrans */
+    /** Success / ticket display page workaround */
+    public function successmidtrans(string $invoice)
+    {
+        $registration = Registration::with(['event', 'category'])
+            ->where('invoice_number', $invoice)->firstOrFail();
+        
+            // Verify payment
+        $registration->update([
+            'payment_status' => 'paid',
+            'payment_verified_at' => now(),
+        ]);
+
 
         return view('checkout.success', compact('registration'));
     }
@@ -323,6 +346,7 @@ class RegistrationController extends Controller
                 'invoice_number' => $registration->invoice_number,
                 'nama_peserta' => $registration->nama_peserta,
                 'payment_status' => $registration->payment_status,
+                'payment_method' => $registration->payment_method,
             ]
         ]);
     }

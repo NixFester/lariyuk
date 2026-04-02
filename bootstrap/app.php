@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\MidtransSnapCsp;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,14 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Register the 'admin' middleware alias
+        // Register middleware aliases
         $middleware->alias([
             'admin' => AdminMiddleware::class,
+            'midtrans.csp' => MidtransSnapCsp::class,
         ]);
 
-        // Exempt IPaymu webhook from CSRF protection
+        // Exempt IPaymu and Midtrans webhooks from CSRF protection
         $middleware->validateCsrfTokens(except: [
             'checkout/ipaymu/webhook',
+            'checkout/midtrans/webhook',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

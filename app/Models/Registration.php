@@ -15,6 +15,7 @@ class Registration extends Model
         'subtotal', 'admin_fee', 'total', 'is_early_bird',
         'ticket_email_sent', 'qris_displayed_at', 'whatsapp_confirmed_at',
         'payment_verified_at', 'ipaymu_transaction_id', 'ipaymu_paid_at',
+        'midtrans_transaction_id', 'midtrans_paid_at',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class Registration extends Model
         'whatsapp_confirmed_at' => 'datetime',
         'payment_verified_at' => 'datetime',
         'ipaymu_paid_at'      => 'datetime',
+        'midtrans_paid_at'    => 'datetime',
     ];
 
     public function event()    { return $this->belongsTo(Event::class); }

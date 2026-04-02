@@ -5,10 +5,20 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\IPaymuController;
+use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\MidtransPlaygroundController;
+
+// midtrans playground routes
+
+Route::middleware('midtrans.csp')->group(function () {
+    Route::get('/midtrans-playground',          [MidtransPlaygroundController::class, 'index'])->name('midtrans.playground');
+    Route::post('/midtrans-playground/token',   [MidtransPlaygroundController::class, 'token'])->name('midtrans.playground.token');
+    Route::get('/midtrans-playground/diagnose', [MidtransPlaygroundController::class, 'diagnose'])->name('midtrans.playground.diagnose');
+});
 
 // ==========================================
 // PUBLIC ROUTES
@@ -40,6 +50,22 @@ Route::prefix('checkout/ipaymu')->name('checkout.ipaymu.')->group(function () {
     Route::post('/webhook', [IPaymuController::class, 'webhook'])->name('webhook')->withoutMiddleware(['web']);
     Route::get('/test', [IPaymuController::class, 'testPage'])->name('test');
     Route::post('/test', [IPaymuController::class, 'runTest'])->name('test.run');
+});
+
+// ==========================================
+// MIDTRANS PAYMENT ROUTES
+// ==========================================
+Route::prefix('checkout/midtrans')->name('checkout.midtrans.')->group(function () {
+    Route::get('/initiate/{invoice}', [MidtransController::class, 'initiate'])->name('initiate');
+    Route::get('/finish/{invoice}', [MidtransController::class, 'finish'])->name('finish');
+    Route::get('/unfinish/{invoice}', [MidtransController::class, 'unfinish'])->name('unfinish');
+    Route::get('/error/{invoice}', [MidtransController::class, 'error'])->name('error');
+    Route::post('/webhook', [MidtransController::class, 'webhook'])->name('webhook')->withoutMiddleware(['web']);
+    Route::get('/check-status', [MidtransController::class, 'checkStatus'])->name('check-status');
+    Route::get('/manual-check-status', [MidtransController::class, 'manualCheckStatus'])->name('manual-check-status');
+    Route::get('/debug', [MidtransController::class, 'debugPage'])->name('debug');
+    Route::get('/success/{invoice}', [RegistrationController::class, 'successmidtrans'])->name('success');
+
 });
 
 // API for notifications
