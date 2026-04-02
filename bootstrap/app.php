@@ -1,0 +1,31 @@
+<?php
+/**
+ * bootstrap/app.php — FULL FILE for Laravel 11
+ * Replace your existing bootstrap/app.php with this.
+ */
+
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Configuration\Exceptions;
+use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\AdminMiddleware;
+
+return Application::configure(basePath: dirname(__DIR__))
+    ->withRouting(
+        web: __DIR__.'/../routes/web.php',
+        commands: __DIR__.'/../routes/console.php',
+        health: '/up',
+    )
+    ->withMiddleware(function (Middleware $middleware) {
+        // Register the 'admin' middleware alias
+        $middleware->alias([
+            'admin' => AdminMiddleware::class,
+        ]);
+
+        // Exempt IPaymu webhook from CSRF protection
+        $middleware->validateCsrfTokens(except: [
+            'checkout/ipaymu/webhook',
+        ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        //
+    })->create();
