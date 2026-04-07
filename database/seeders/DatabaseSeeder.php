@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
 
         Admin::create([
             'name'     => 'Admin LariYuk',
-            'email'    => 'admin@lariyuk.id',
-            'password' => bcrypt('admin'),
+            'email'    => 'Admin2026@run.id',
+            'password' => bcrypt('Tegalmaju2026*'),
         ]);
 
         $eventsData = [

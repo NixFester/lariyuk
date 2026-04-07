@@ -17,6 +17,27 @@
     </div>
     @endif
 
+    <div class="mb-6 bg-white rounded-lg border border-gray-200 p-6">
+        <h2 class="text-xl font-semibold text-slate-900 mb-4">Nomor WhatsApp</h2>
+        <form method="POST" action="{{ route('admin.payment-methods.whatsapp-number.update') }}" class="space-y-4">
+            @csrf
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Nomor:</label>
+                <input type="text" name="whatsapp_number" value="{{ old('whatsapp_number', config('app.whatsapp_number')) }}" placeholder="e.g., +6281234567890"
+                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none @error('whatsapp_number') border-red-500 @enderror">
+                @error('whatsapp_number')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-slate-500 mt-1">
+                    nomor ini digunakan untuk kontak support, kontak verifikasi dan email tiket<br>
+                    This number is used for support contact, verification contact, and ticket emails.</p>
+            </div>
+            <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                Save WhatsApp Number
+            </button>
+        </form>
+    </div>
+
     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full divide-y divide-gray-200">
@@ -39,7 +60,11 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             @if($method->icon)
-                            <img src="{{ asset('storage/' . $method->icon) }}" alt="{{ $method->name }}" class="w-8 h-8 rounded">
+                                @if($method->name === 'QRIS')
+                                <img src="{{ asset('Logo_QRIS.svg') }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">
+                                @else
+                                <img src="{{ asset('storage/' . $method->icon) }}" alt="{{ $method->name }}" class="w-8 h-8 rounded">
+                                @endif
                             @else
                             <span class="text-xs text-slate-400">No icon</span>
                             @endif
@@ -59,11 +84,13 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                             <a href="{{ route('admin.payment-methods.edit', $method) }}" class="text-blue-600 hover:text-blue-900 font-medium">Edit</a>
+                            @if($method->name !== 'QRIS')
                             <form method="POST" action="{{ route('admin.payment-methods.destroy', $method) }}" class="inline" onsubmit="return confirm('Are you sure?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-900 font-medium">Delete</button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                     @empty

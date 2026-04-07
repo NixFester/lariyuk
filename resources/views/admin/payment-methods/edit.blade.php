@@ -60,20 +60,32 @@
             </div>
 
             <div>
+                @if ($paymentMethod->name === 'QRIS')
+                <label class="block text-sm font-medium text-slate-700 mb-2">Kode QR QRIS</label>
+                @else
                 <label class="block text-sm font-medium text-slate-700 mb-2">Icon (Optional)</label>
+                @endif
                 @if($paymentMethod->icon)
                 <div class="mb-3">
-                    <p class="text-sm text-slate-600 mb-2">Current icon:</p>
-                    <img src="{{ asset('storage/' . $paymentMethod->icon) }}" alt="{{ $paymentMethod->name }}" class="w-12 h-12 rounded">
+                    @if ($paymentMethod->name === 'QRIS')
+                    <p class="text-sm text-slate-600 mb-2">Kode QR:</p>
+                    @else
+                    <p class="text-sm text-slate-600 mb-2">Icon saat ini:</p>
+                    @endif
+                    <img src="{{ asset('storage/' . $paymentMethod->icon) }}" alt="{{ $paymentMethod->name }}" class="w-full h-full rounded">
                 </div>
                 @endif
                 <input type="file" name="icon" accept="image/*" class="w-full px-4 py-2 border border-gray-200 rounded-lg @error('icon') border-red-500 @enderror">
-                <p class="text-xs text-slate-500 mt-1">Accepted formats: JPEG, PNG, JPG, GIF, SVG (Max 2MB). Leave blank to keep current icon.</p>
+                @if ($paymentMethod->name === 'QRIS')
+                <p class="text-xs text-slate-500 mt-1">Format yang diterima: JPEG, PNG, JPG</p>
+                @else
+                <p class="text-xs text-slate-500 mt-1">Format yang diterima: JPEG, PNG, JPG, GIF, SVG (Max 2MB). Jangan diisi jika tidak ingin mengganti icon.</p>
+                @endif
                 @error('icon')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
-
+            @if ($paymentMethod->name !== 'QRIS')
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">Display Order *</label>
                 <input type="number" name="display_order" value="{{ old('display_order', $paymentMethod->display_order) }}" min="0" required
@@ -83,6 +95,7 @@
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
             </div>
+           
 
             <div>
                 <label class="flex items-center gap-2">
@@ -90,6 +103,10 @@
                     <span class="text-sm font-medium text-slate-700">Active</span>
                 </label>
             </div>
+            @else
+            <input type="hidden" name="is_active" value="{{ old('is_active', $paymentMethod->is_active ? 1 : 0) }}">
+            <input type="hidden" name="display_order" value="{{ old('display_order', $paymentMethod->display_order ?? 0) }}">
+            @endif
 
             <div class="flex gap-3 pt-4">
                 <button type="submit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">

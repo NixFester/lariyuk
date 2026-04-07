@@ -94,6 +94,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Registrations
         Route::get('/registrations', [AdminRegistrationController::class, 'index'])->name('registrations.index');
+        Route::get('/registrations/event/{eventId}', [AdminRegistrationController::class, 'byEvent'])->name('registrations.by-event');
+        Route::get('/registrations/event/{eventId}/category/{categoryId}', [AdminRegistrationController::class, 'byCategory'])->name('registrations.by-category');
+        Route::get('/registrations/event/{eventId}/category/{categoryId}/export', [AdminRegistrationController::class, 'exportByCategory'])->name('registrations.export-by-category');
         Route::get('/registrations/verification', [AdminRegistrationController::class, 'verification'])->name('registrations.verification');
         Route::post('/registrations/{id}/verify-payment', [AdminRegistrationController::class, 'verifyPayment'])->name('registrations.verify-payment');
         Route::get('/registrations/export', [AdminRegistrationController::class, 'export'])->name('registrations.export');
@@ -102,5 +105,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Payment Methods
         Route::resource('payment-methods', PaymentMethodController::class)->except(['show']);
+        Route::post('/payment-methods/whatsapp-number', [PaymentMethodController::class, 'updateWhatsAppNumber'])->name('payment-methods.whatsapp-number.update');
     });
 });

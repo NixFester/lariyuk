@@ -108,35 +108,51 @@
             <div class="sm:col-span-2">
               <label class="block text-sm font-medium text-slate-700 mb-1.5">Ukuran Kaos</label>
               <div class="flex flex-wrap gap-2 mb-2">
-                @foreach(['XS','S','M','L','XL','XXL'] as $size)
+                @php
+                  $sizeOptions = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+                @endphp
+                @foreach($sizeOptions as $size)
+                  {{-- Normal variant --}}
                   <label class="cursor-pointer">
                     <input type="radio" name="ukuran_kaos" value="{{ $size }}" class="sr-only peer" {{ old('ukuran_kaos')==$size ? 'checked' : '' }} required>
-                    <span class="block px-4 py-2 border-2 border-gray-200 rounded-lg text-sm font-semibold text-slate-600 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 transition-colors">{{ $size }}</span>
+                    <span class="block px-3 py-2 border-2 border-gray-200 rounded-lg text-xs font-semibold text-slate-600 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 transition-colors">{{ $size }}<span class="hidden sm:inline text-gray-400"> Normal</span></span>
                   </label>
+                  {{-- Sport variant (not for XXS) --}}
+                  @if($size !== 'XXS')
+                    <label class="cursor-pointer">
+                      <input type="radio" name="ukuran_kaos" value="{{ $size }}-sport" class="sr-only peer" {{ old('ukuran_kaos')==$size.'-sport' ? 'checked' : '' }}>
+                      <span class="block px-3 py-2 border-2 border-gray-200 rounded-lg text-xs font-semibold text-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:border-gray-300 transition-colors">{{ $size }}<span class="hidden sm:inline text-gray-400"> Sport</span></span>
+                    </label>
+                  @endif
                 @endforeach
               </div>
+              <p class="text-xs text-slate-500 mb-2"><span class="text-blue-600 font-medium">Sport</span> lebih kecil selisih 1 ukuran</p>
               <details class="text-xs sm:text-sm text-slate-500 mt-1">
                 <summary class="cursor-pointer hover:text-green-600 font-medium">📏 Lihat panduan ukuran kaos</summary>
                 <div class="mt-3 rounded-lg border border-gray-200 overflow-hidden">
                   {{-- Mobile: Card Layout --}}
                   <div class="sm:hidden space-y-2 p-4 bg-white">
-                    @foreach(['XS'=>['82–87','65'],'S'=>['88–93','67'],'M'=>['94–99','69'],'L'=>['100–105','71'],'XL'=>['106–111','73'],'XXL'=>['112–117','75']] as $s=>$d)
-                      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                        <span class="font-bold text-green-600 text-base">{{ $s }}</span>
-                        <div class="text-right text-xs sm:text-sm">
-                          <p class="text-slate-600">Dada: <span class="font-medium">{{ $d[0] }} cm</span></p>
-                          <p class="text-slate-600">Panjang: <span class="font-medium">{{ $d[1] }} cm</span></p>
+                    @foreach($shirtSizes as $size => $variants)
+                      @foreach($variants as $variant => $dims)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                          <span class="font-bold text-green-600 text-base">{{ $size }}<span class="text-xs text-gray-500"> {{ ucfirst($variant) }}</span></span>
+                          <div class="text-right text-xs sm:text-sm">
+                            <p class="text-slate-600">Lebar: <span class="font-medium">{{ $dims['width'] }} cm</span></p>
+                            <p class="text-slate-600">Panjang: <span class="font-medium">{{ $dims['length'] }} cm</span></p>
+                          </div>
                         </div>
-                      </div>
+                      @endforeach
                     @endforeach
                   </div>
                   {{-- Desktop: Table Layout --}}
                   <div class="hidden sm:block overflow-x-auto">
                     <table class="text-sm w-full">
-                      <thead><tr class="bg-gray-50"><th class="px-4 py-2 text-left font-semibold text-slate-700">Ukuran</th><th class="px-4 py-2 text-left font-semibold text-slate-700">Lingkar Dada</th><th class="px-4 py-2 text-left font-semibold text-slate-700">Panjang</th></tr></thead>
+                      <thead><tr class="bg-gray-50"><th class="px-4 py-2 text-left font-semibold text-slate-700">Ukuran</th><th class="px-4 py-2 text-left font-semibold text-slate-700">Varian</th><th class="px-4 py-2 text-left font-semibold text-slate-700">Lebar</th><th class="px-4 py-2 text-left font-semibold text-slate-700">Panjang</th></tr></thead>
                       <tbody>
-                        @foreach(['XS'=>['82–87','65'],'S'=>['88–93','67'],'M'=>['94–99','69'],'L'=>['100–105','71'],'XL'=>['106–111','73'],'XXL'=>['112–117','75']] as $s=>$d)
-                          <tr class="border-t border-gray-100"><td class="px-4 py-2 font-bold text-green-600">{{ $s }}</td><td class="px-4 py-2">{{ $d[0] }} cm</td><td class="px-4 py-2">{{ $d[1] }} cm</td></tr>
+                        @foreach($shirtSizes as $size => $variants)
+                          @foreach($variants as $variant => $dims)
+                            <tr class="border-t border-gray-100"><td class="px-4 py-2 font-bold text-green-600">{{ $size }}</td><td class="px-4 py-2 text-slate-600">{{ ucfirst($variant) }}</td><td class="px-4 py-2">{{ $dims['width'] }} cm</td><td class="px-4 py-2">{{ $dims['length'] }} cm</td></tr>
+                          @endforeach
                         @endforeach
                       </tbody>
                     </table>

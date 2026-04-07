@@ -122,7 +122,9 @@
             <button type="button"
                     class="flex flex-col items-center justify-center gap-2 p-4 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer group"
                     onclick="openPaymentModal({{ $method->id }})">
-              @if($method->icon)
+              @if($method->name === 'QRIS')
+                <img src="{{ asset('Logo_QRIS.svg') }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">
+              @elseif($method->icon)
                 <img src="{{ asset('storage/' . $method->icon) }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">
               @else
                 <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-xs font-bold text-slate-600">
@@ -139,7 +141,7 @@
         {{-- Confirmation Buttons --}}
         <div class="space-y-3 pt-6 border-t border-gray-200">
           @php
-            $waNumber = env('WHATSAAP_NUMBER');
+            $waNumber = config('app.whatsapp_number');
             $verifyLink = route('checkout.verify', $registration->invoice_number, true); // Absolute URL
             $waMessage = "Halo, saya telah menyelesaikan pembayaran untuk invoice: " . $registration->invoice_number . " Nama: " . $registration->nama_peserta . " Silakan klik link berikut untuk memverifikasi pembayaran (login terlebih dahulu jika belum): " . $verifyLink;
             $waLink = "https://wa.me/{$waNumber}?text=" . urlencode($waMessage);
@@ -188,7 +190,7 @@
     {{-- Payment Details --}}
     @if($method->name === 'QRIS')
       <div class="bg-slate-50 rounded-xl p-6 mb-6 flex justify-center">
-        <img src="{{ asset('qris.jpeg') }}" alt="QRIS Code" class="w-56 h-56">
+        <img src="{{ asset('storage/' . $method->icon) }}" alt="QRIS Code" class="w-full h-full object-contain">
       </div>
     @else
     <p class="text-slate-500 text-sm mb-6">{{ $method->description }}</p>

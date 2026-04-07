@@ -14,6 +14,30 @@ use Illuminate\Support\Facades\Mail;
 
 class RegistrationController extends Controller
 {
+    /**
+     * Normalize Indonesian phone numbers:
+     * - Convert 08xxx to +628xxx
+     * - Keep +62xxx as is
+     * - If number doesn't match patterns, return as is
+     */
+    private function normalizePhoneNumber(string $phone): string
+    {
+        $phone = trim(preg_replace('/\s+/', '', $phone));
+        
+        // Already has +62 prefix
+        if (str_starts_with($phone, '+62')) {
+            return $phone;
+        }
+        
+        // Convert 08xxx to +628xxx
+        if (str_starts_with($phone, '08')) {
+            return '+62' . substr($phone, 1);
+        }
+        
+        // Return as is if it doesn't match patterns
+        return $phone;
+    }
+
     /** Show checkout form */
     public function show(string $slug, string $categoryId)
     {
@@ -27,12 +51,41 @@ class RegistrationController extends Controller
         $total       = $price + $adminFee;
 
         $shirtSizes = [
-            'XS'  => ['chest' => '82–87',   'length' => '65'],
-            'S'   => ['chest' => '88–93',   'length' => '67'],
-            'M'   => ['chest' => '94–99',   'length' => '69'],
-            'L'   => ['chest' => '100–105', 'length' => '71'],
-            'XL'  => ['chest' => '106–111', 'length' => '73'],
-            'XXL' => ['chest' => '112–117', 'length' => '75'],
+            'XXS' => [
+                'normal' => ['width' => '46', 'length' => '60'],
+            ],
+            'XS' => [
+                'normal' => ['width' => '48', 'length' => '62'],
+                'sport' => ['width' => '46', 'length' => '60'],
+            ],
+            'S' => [
+                'normal' => ['width' => '50', 'length' => '65'],
+                'sport' => ['width' => '48', 'length' => '62'],
+            ],
+            'M' => [
+                'normal' => ['width' => '52', 'length' => '68'],
+                'sport' => ['width' => '50', 'length' => '65'],
+            ],
+            'L' => [
+                'normal' => ['width' => '54', 'length' => '70'],
+                'sport' => ['width' => '52', 'length' => '68'],
+            ],
+            'XL' => [
+                'normal' => ['width' => '56', 'length' => '72'],
+                'sport' => ['width' => '54', 'length' => '70'],
+            ],
+            '2XL' => [
+                'normal' => ['width' => '58', 'length' => '74'],
+                'sport' => ['width' => '56', 'length' => '72'],
+            ],
+            '3XL' => [
+                'normal' => ['width' => '60', 'length' => '78'],
+                'sport' => ['width' => '58', 'length' => '74'],
+            ],
+            '4XL' => [
+                'normal' => ['width' => '62', 'length' => '80'],
+                'sport' => ['width' => '60', 'length' => '78'],
+            ],
         ];
 
         return view('checkout.show', compact(
@@ -53,7 +106,7 @@ class RegistrationController extends Controller
             'phone'               => 'required|string|max:20',
             'tanggal_lahir'       => 'required|date',
             'jenis_kelamin'       => 'required|in:L,P',
-            'ukuran_kaos'         => 'required|in:XS,S,M,L,XL,XXL',
+            'ukuran_kaos'         => 'required|in:XXS,XS,XS-sport,S,S-sport,M,M-sport,L,L-sport,XL,XL-sport,2XL,2XL-sport,3XL,3XL-sport,4XL,4XL-sport',
             'golongan_darah'      => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
             'kontak_darurat_nama' => 'required|string|max:150',
             'kontak_darurat_hp'   => 'required|string|max:20',
@@ -61,6 +114,11 @@ class RegistrationController extends Controller
 
         $event    = Event::findOrFail($data['event_id']);
         $category = EventCategory::findOrFail($data['event_category_id']);
+
+        // ── Normalize phone numbers ─────────────────────────────────────
+        $data['phone'] = $this->normalizePhoneNumber($data['phone']);
+        $data['kontak_darurat_hp'] = $this->normalizePhoneNumber($data['kontak_darurat_hp']);
+        // ────────────────────────────────────────────────────────────────
 
         $isEarlyBird = $event->is_early_bird_active;
         $price       = $category->active_price;

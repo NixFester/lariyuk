@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\PaymentMethod;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 
 class PaymentMethodController
@@ -49,6 +50,24 @@ class PaymentMethodController
 
         return redirect()->route('admin.payment-methods.index')
                         ->with('success', 'Payment method created successfully.');
+    }
+
+    /**
+     * Update global WhatsApp number from the payment methods admin view
+     */
+    public function updateWhatsAppNumber(Request $request)
+    {
+        $validated = $request->validate([
+            'whatsapp_number' => 'nullable|string|max:255',
+        ]);
+
+        Setting::updateOrCreate(
+            ['key' => 'whatsapp_number'],
+            ['value' => $validated['whatsapp_number']]
+        );
+
+        return redirect()->route('admin.payment-methods.index')
+                        ->with('success', 'WhatsApp number updated successfully.');
     }
 
     /**

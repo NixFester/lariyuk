@@ -77,25 +77,40 @@
       {{-- Shirt Size Chart --}}
       <div class="bg-white rounded-2xl border border-gray-200 p-6">
         <h2 class="font-display font-bold text-lg text-slate-900 mb-4">Panduan Ukuran Kaos</h2>
-        <p class="text-sm text-slate-500 mb-4">Semua ukuran dalam sentimeter (cm). Lingkar dada diukur dari bagian terlebar.</p>
+        <p class="text-sm text-slate-500 mb-4">Semua ukuran dalam sentimeter (cm). <span class="text-blue-600 font-medium">Sport</span> lebih kecil selisih 1 ukuran.</p>
         <div class="overflow-x-auto">
           <table class="w-full text-sm text-left">
             <thead>
               <tr class="border-b border-gray-200">
                 <th class="pb-3 font-semibold text-slate-700">Ukuran</th>
-                <th class="pb-3 font-semibold text-slate-700">Lingkar Dada (cm)</th>
-                <th class="pb-3 font-semibold text-slate-700">Panjang Baju (cm)</th>
-                <th class="pb-3 font-semibold text-slate-700">Lingkar Lengan (cm)</th>
+                <th class="pb-3 font-semibold text-slate-700">Varian</th>
+                <th class="pb-3 font-semibold text-slate-700">Lebar (cm)</th>
+                <th class="pb-3 font-semibold text-slate-700">Panjang (cm)</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-              @foreach(['XS'=>['82–87','65','33'],'S'=>['88–93','67','34'],'M'=>['94–99','69','36'],'L'=>['100–105','71','38'],'XL'=>['106–111','73','40'],'XXL'=>['112–117','75','42']] as $size => $dims)
-                <tr class="hover:bg-gray-50">
-                  <td class="py-3 font-bold text-primary-600">{{ $size }}</td>
-                  <td class="py-3 text-slate-600">{{ $dims[0] }}</td>
-                  <td class="py-3 text-slate-600">{{ $dims[1] }}</td>
-                  <td class="py-3 text-slate-600">{{ $dims[2] }}</td>
-                </tr>
+              @php
+                $shirtSizes = [
+                  'XXS' => ['normal' => ['width' => '46', 'length' => '60']],
+                  'XS' => ['normal' => ['width' => '48', 'length' => '62'], 'sport' => ['width' => '46', 'length' => '60']],
+                  'S' => ['normal' => ['width' => '50', 'length' => '65'], 'sport' => ['width' => '48', 'length' => '62']],
+                  'M' => ['normal' => ['width' => '52', 'length' => '68'], 'sport' => ['width' => '50', 'length' => '65']],
+                  'L' => ['normal' => ['width' => '54', 'length' => '70'], 'sport' => ['width' => '52', 'length' => '68']],
+                  'XL' => ['normal' => ['width' => '56', 'length' => '72'], 'sport' => ['width' => '54', 'length' => '70']],
+                  '2XL' => ['normal' => ['width' => '58', 'length' => '74'], 'sport' => ['width' => '56', 'length' => '72']],
+                  '3XL' => ['normal' => ['width' => '60', 'length' => '78'], 'sport' => ['width' => '58', 'length' => '74']],
+                  '4XL' => ['normal' => ['width' => '62', 'length' => '80'], 'sport' => ['width' => '60', 'length' => '78']],
+                ];
+              @endphp
+              @foreach($shirtSizes as $size => $variants)
+                @foreach($variants as $variant => $dims)
+                  <tr class="hover:bg-gray-50">
+                    <td class="py-3 font-bold text-primary-600">{{ $size }}</td>
+                    <td class="py-3 text-slate-600">{{ ucfirst($variant) }}</td>
+                    <td class="py-3 text-slate-600">{{ $dims['width'] }}</td>
+                    <td class="py-3 text-slate-600">{{ $dims['length'] }}</td>
+                  </tr>
+                @endforeach
               @endforeach
             </tbody>
           </table>
