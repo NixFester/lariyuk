@@ -42,7 +42,7 @@
           Masuk ke Dashboard
         </button>
       </form>
-      <p class="text-center text-xs text-slate-400 mt-6">Default: admin@lariyuk.id / password123</p>
+      <p class="text-center text-xs text-slate-400 mt-6">Call Support / Developer <a href="https://elcoding.id" target="_blank" class="text-green-500 hover:underline">elcoding.id</a></p>
     </div>
     <p class="text-center mt-4"><a href="{{ route('home') }}" class="text-slate-400 hover:text-white text-sm">&larr; Kembali ke situs</a></p>
   </div>

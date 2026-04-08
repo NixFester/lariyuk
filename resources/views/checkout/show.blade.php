@@ -20,6 +20,17 @@
     </div>
   @endif
 
+  @if(!$category->hasAvailableSlots())
+    <div class="bg-orange-50 border border-orange-300 rounded-xl p-4 mb-6 flex items-center gap-3">
+      <svg class="w-5 h-5 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4v2m0 4v2M7.08 6.06A9 9 0 1 0 15.94 17.94M7.08 6.06l.463 2.137a11.218 11.218 0 0 1 .473 2.104"/></svg>
+      <div>
+        <p class="font-semibold text-orange-900">Kuota Kategori Penuh</p>
+        <p class="text-sm text-orange-700">Maaf, kuota untuk kategori "{{ $category->name }}" telah penuh. Silakan </p>
+        <a href="{{ route('events.show', $event->slug) }}" class="text-orange-600 hover:text-orange-700 font-medium underline">kembali dan pilih kategori lain</a>
+      </div>
+    </div>
+  @endif
+
   <form action="{{ route('checkout.store') }}" method="POST">
     @csrf
     <input type="hidden" name="event_id"          value="{{ $event->id }}">

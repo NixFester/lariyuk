@@ -66,7 +66,7 @@
             </p>
             <div class="flex flex-wrap gap-1.5 mb-4">
               @foreach($event->categories->take(3) as $cat)
-                <span class="px-2 py-1 bg-gray-100 text-xs font-medium text-slate-600 rounded-md">{{ $cat->name }}</span>
+                <span class="px-2 py-1 bg-gray-100 text-xs font-medium text-slate-600 rounded-md">{{ $cat->name }} ({{ $cat->getRegistrationCount() }}/{{ $cat->limit }})</span>
               @endforeach
               @if($event->categories->count() > 3)
                 <span class="px-2 py-1 bg-gray-100 text-xs font-medium text-slate-500 rounded-md">+{{ $event->categories->count()-3 }}</span>

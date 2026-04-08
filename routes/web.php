@@ -38,6 +38,11 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::post('/resend-ticket/{invoice}', [RegistrationController::class, 'resendTicket'])->name('resend-ticket');
     Route::get('/verify/{invoice}', [RegistrationController::class, 'verifyRegistrationLink'])->name('verify');
     Route::post('/register', [RegistrationController::class, 'store'])->name('store');
+    
+    // API endpoints for category availability
+    Route::get('/api/categories/{categoryId}/availability', [RegistrationController::class, 'checkCategoryAvailability'])->name('api.category-availability');
+    Route::get('/api/events/{eventSlug}/categories-availability', [RegistrationController::class, 'getEventCategoriesAvailability'])->name('api.event-categories-availability');
+    
     Route::get('/{event}/{category}', [RegistrationController::class, 'show'])->name('show');
 });
 

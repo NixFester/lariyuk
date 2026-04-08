@@ -80,7 +80,7 @@
         <h2 class="font-display font-bold text-lg text-slate-800">Kategori & Harga</h2>
         <button type="button" onclick="addCategory()" class="px-3 py-1.5 bg-green-50 text-green-700 hover:bg-green-100 text-sm font-medium rounded-lg transition-colors">+ Tambah</button>
       </div>
-      <p class="text-xs text-slate-500 mb-4">Harga early bird dihitung otomatis (harga normal – 10%) saat event memiliki tanggal early bird.</p>
+      <p class="text-xs text-slate-500 mb-4">Harga early bird dihitung otomatis (harga normal – 10%) saat event memiliki tanggal early bird. Limit default: 200 peserta.</p>
       <div id="categoriesContainer" class="space-y-3">
         @if($event)
           @foreach($event->categories as $i => $cat)
@@ -90,7 +90,12 @@
               <div class="flex items-center gap-1.5">
                 <span class="text-sm text-slate-500">Rp</span>
                 <input type="number" name="categories[{{ $i }}][normal_price]" value="{{ $cat->normal_price }}" placeholder="Harga normal" required min="0"
-                       class="w-36 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                       class="w-32 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-sm text-slate-500">Kuota:</span>
+                <input type="number" name="categories[{{ $i }}][limit]" value="{{ $cat->limit }}" placeholder="200" min="1"
+                       class="w-24 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
               </div>
               <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-400 hover:text-red-600 p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -101,7 +106,10 @@
           <div class="category-row flex items-center gap-3">
             <input type="text" name="categories[0][name]" placeholder="Nama kategori (cth: 5K)" required class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             <div class="flex items-center gap-1.5"><span class="text-sm text-slate-500">Rp</span>
-              <input type="number" name="categories[0][normal_price]" placeholder="Harga normal" required min="0" class="w-36 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+              <input type="number" name="categories[0][normal_price]" placeholder="Harga normal" required min="0" class="w-32 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <div class="flex items-center gap-1.5"><span class="text-sm text-slate-500">Kuota:</span>
+              <input type="number" name="categories[0][limit]" placeholder="200" min="1" class="w-24 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
             <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-400 hover:text-red-600 p-1">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -176,7 +184,11 @@
              class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
       <div class="flex items-center gap-1.5"><span class="text-sm text-slate-500">Rp</span>
         <input type="number" name="categories[${catIdx}][normal_price]" placeholder="Harga" required min="0"
-               class="w-36 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+               class="w-32 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+      </div>
+      <div class="flex items-center gap-1.5"><span class="text-sm text-slate-500">Kuota:</span>
+        <input type="number" name="categories[${catIdx}][limit]" placeholder="200" min="1"
+               class="w-24 px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
       </div>
       <button type="button" onclick="this.closest('.category-row').remove()" class="text-red-400 hover:text-red-600 p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>

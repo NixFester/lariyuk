@@ -133,8 +133,11 @@
         <div class="space-y-3 mb-6">
           @foreach($event->categories as $cat)
             <a href="{{ route('checkout.show', [$event->slug, $cat->id]) }}"
-               class="flex items-center justify-between p-3 rounded-xl border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition-colors group">
-              <span class="font-medium text-slate-900 group-hover:text-primary-700">{{ $cat->name }}</span>
+               class="flex items-center justify-between p-3 rounded-xl border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition-colors group {{ !$cat->hasAvailableSlots() ? 'opacity-50 cursor-not-allowed hover:border-gray-200 hover:bg-white' : '' }}">
+              <div>
+                <span class="font-medium text-slate-900 group-hover:text-primary-700">{{ $cat->name }}</span>
+                <p class="text-xs text-slate-500 mt-1">Kuota: {{ $cat->getRegistrationCount() }}/{{ $cat->limit }}</p>
+              </div>
               <div class="text-right">
                 @if($event->is_early_bird_active && $cat->early_bird_price)
                   <p class="text-xs line-through text-slate-400">Rp {{ number_format($cat->normal_price,0,',','.') }}</p>

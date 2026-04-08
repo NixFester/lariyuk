@@ -111,6 +111,7 @@ class EventController extends Controller
             'categories'               => 'required|array|min:1',
             'categories.*.name'        => 'required|string',
             'categories.*.normal_price'=> 'required|integer|min:0',
+            'categories.*.limit'       => 'nullable|integer|min:1',
 
             // Highlights
             'highlights'   => 'nullable|array',
@@ -159,12 +160,14 @@ class EventController extends Controller
             $earlyBird   = $event->early_bird_until
                 ? (int) round($normalPrice * 0.90) // 10% off
                 : null;
+            $limit = isset($cat['limit']) && $cat['limit'] ? (int) $cat['limit'] : 200;
 
             EventCategory::create([
                 'event_id'          => $event->id,
                 'name'              => $cat['name'],
                 'normal_price'      => $normalPrice,
                 'early_bird_price'  => $earlyBird,
+                'limit'             => $limit,
             ]);
         }
     }

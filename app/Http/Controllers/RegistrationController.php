@@ -115,6 +115,13 @@ class RegistrationController extends Controller
         $event    = Event::findOrFail($data['event_id']);
         $category = EventCategory::findOrFail($data['event_category_id']);
 
+        // Check if category has available slots
+        if (!$category->hasAvailableSlots()) {
+            return redirect()->back()
+                ->with('error', 'Maaf, kuota untuk kategori ' . $category->name . ' telah penuh. Silakan pilih kategori lain.')
+                ->withInput();
+        }
+
         // ── Normalize phone numbers ─────────────────────────────────────
         $data['phone'] = $this->normalizePhoneNumber($data['phone']);
         $data['kontak_darurat_hp'] = $this->normalizePhoneNumber($data['kontak_darurat_hp']);
@@ -458,5 +465,83 @@ class RegistrationController extends Controller
 
         return redirect()->route('admin.registrations.verification')
             ->with('success', "Pembayaran {$registration->nama_peserta} ({$invoice}) berhasil diverifikasi!");
+    }
+
+    /**
+     * API endpoint to check category availability
+     * Used by JavaScript frontend for real-time validation
+     */
+    public function checkCategoryAvailability(int $categoryId)
+    {
+        try {
+            $category = EventCategory::with('event')
+                ->findOrFail($categoryId);
+
+            $registrationCount = $category->getRegistrationCount();
+            $availableSlots = $category->getAvailableSlots();
+            $hasSlots = $category->hasAvailableSlots();
+
+            return response()->json([
+                'id' => $category->id,
+                'name' => $category->name,
+                'limit' => $category->limit,
+                'registration_count' => $registrationCount,
+                'available_slots' => $availableSlots,
+                'has_slots' => $hasSlots,
+                'message' => $hasSlots 
+                    ? "Sisa kuota: {$availableSlots} dari {$category->limit}"
+                    : "Maaf, kuota untuk kategori '{$category->name}' telah penuh",
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error checking category availability', [
+                'category_id' => $categoryId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'error' => 'Gagal memeriksa ketersediaan kategori',
+            ], 500);
+        }
+    }
+
+    /**
+     * Get all categories with their availability for an event
+     */
+    public function getEventCategoriesAvailability(string $eventSlug)
+    {
+        try {
+            $event = Event::where('slug', $eventSlug)
+                ->with('categories')
+                ->firstOrFail();
+
+            $categoriesWithAvailability = $event->categories->map(function ($category) {
+                return [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'normal_price' => $category->normal_price,
+                    'early_bird_price' => $category->early_bird_price,
+                    'limit' => $category->limit,
+                    'registration_count' => $category->getRegistrationCount(),
+                    'available_slots' => $category->getAvailableSlots(),
+                    'has_slots' => $category->hasAvailableSlots(),
+                ];
+            });
+
+            return response()->json([
+                'event_id' => $event->id,
+                'event_slug' => $event->slug,
+                'event_title' => $event->title,
+                'categories' => $categoriesWithAvailability,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching event categories availability', [
+                'event_slug' => $eventSlug,
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'error' => 'Gagal mengambil data kategori event',
+            ], 500);
+        }
     }
 }
