@@ -39,6 +39,11 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/verify/{invoice}', [RegistrationController::class, 'verifyRegistrationLink'])->name('verify');
     Route::post('/register', [RegistrationController::class, 'store'])->name('store');
     
+    // Re-registration routes (for system error recovery)
+    Route::get('/reregister/{token}', [RegistrationController::class, 'showReregister'])->name('reregister');
+    Route::post('/reregister/{token}', [RegistrationController::class, 'storeReregister'])->name('reregister.store');
+    Route::get('/reregister-success/{invoice}', [RegistrationController::class, 'reregisterSuccess'])->name('reregister.success');
+    
     // API endpoints for category availability
     Route::get('/api/categories/{categoryId}/availability', [RegistrationController::class, 'checkCategoryAvailability'])->name('api.category-availability');
     Route::get('/api/events/{eventSlug}/categories-availability', [RegistrationController::class, 'getEventCategoriesAvailability'])->name('api.event-categories-availability');
@@ -104,6 +109,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/registrations/event/{eventId}/category/{categoryId}/export', [AdminRegistrationController::class, 'exportByCategory'])->name('registrations.export-by-category');
         Route::get('/registrations/verification', [AdminRegistrationController::class, 'verification'])->name('registrations.verification');
         Route::post('/registrations/{id}/verify-payment', [AdminRegistrationController::class, 'verifyPayment'])->name('registrations.verify-payment');
+        Route::post('/registrations/{id}/skip-payment', [AdminRegistrationController::class, 'skipPayment'])->name('registrations.skip-payment');
         Route::get('/registrations/export', [AdminRegistrationController::class, 'export'])->name('registrations.export');
         Route::delete('/registrations/{id}', [AdminRegistrationController::class, 'destroy'])->name('registrations.destroy');
         Route::get('/registrations/{id}', [AdminRegistrationController::class, 'show'])->name('registrations.show');
@@ -111,5 +117,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Payment Methods
         Route::resource('payment-methods', PaymentMethodController::class)->except(['show']);
         Route::post('/payment-methods/whatsapp-number', [PaymentMethodController::class, 'updateWhatsAppNumber'])->name('payment-methods.whatsapp-number.update');
+
+        // Apology Emails (System Error Recovery)
+        Route::prefix('apology-emails')->name('apology-emails.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'index'])->name('index');
+            Route::post('/send-all', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'sendAll'])->name('send-all');
+            Route::post('/regenerate-expired', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'regenerateExpired'])->name('regenerate-expired');
+            Route::get('/{token}', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'show'])->name('show');
+            Route::post('/{token}/send', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'sendOne'])->name('send-one');
+        });
     });
 });

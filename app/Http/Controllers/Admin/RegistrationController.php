@@ -212,19 +212,28 @@ class RegistrationController extends Controller
     /** Show payment verification page */
     public function verification(Request $request)
     {
-        $query = Registration::with(['event', 'category'])
+        // Registrations that need verification (WA confirmed)
+        $queryVerified = Registration::with(['event', 'category'])
             ->where('payment_status', 'pending')
             ->whereNotNull('whatsapp_confirmed_at')
             ->latest();
 
+        // Registrations pending WA confirmation
+        $queryUnconfirmed = Registration::with(['event', 'category'])
+            ->where('payment_status', 'pending')
+            ->whereNull('whatsapp_confirmed_at')
+            ->latest();
+
         if ($eventId = $request->get('event_id')) {
-            $query->where('event_id', $eventId);
+            $queryVerified->where('event_id', $eventId);
+            $queryUnconfirmed->where('event_id', $eventId);
         }
 
-        $registrations = $query->paginate(20)->withQueryString();
+        $registrations = $queryVerified->paginate(20, ['*'], 'page_verified')->withQueryString();
+        $pendingRegistrations = $queryUnconfirmed->paginate(20, ['*'], 'page_pending')->withQueryString();
         $events = Event::orderBy('title')->get();
 
-        return view('admin.registrations.verification', compact('registrations', 'events'));
+        return view('admin.registrations.verification', compact('registrations', 'pendingRegistrations', 'events'));
     }
 
     /** Verify payment and mark as paid */
@@ -248,5 +257,33 @@ class RegistrationController extends Controller
 
         return redirect()->route('admin.registrations.verification')
             ->with('success', 'Pembayaran ' . $reg->invoice_number . ' berhasil diverifikasi. Tiket telah dikirim ke email.');
+    }
+
+    /** Skip payment verification for registrations without WA confirmation */
+    public function skipPayment(string $id)
+    {
+        $reg = Registration::findOrFail($id);
+
+        if ($reg->payment_status === 'paid') {
+            return redirect()->route('admin.registrations.verification')
+                ->with('warning', 'Pembayaran sudah terverifikasi sebelumnya.');
+        }
+
+        if ($reg->whatsapp_confirmed_at) {
+            return redirect()->route('admin.registrations.verification')
+                ->with('warning', 'Pembayaran sudah dikonfirmasi via WhatsApp.');
+        }
+
+        $reg->update([
+            'payment_status' => 'paid',
+            'payment_verified_at' => now(),
+        ]);
+
+        // Send ticket via email after payment verification
+        Mail::to($reg->email)->send(new TicketMail($reg));
+        $reg->update(['ticket_email_sent' => true]);
+
+        return redirect()->route('admin.registrations.verification')
+            ->with('success', 'Pembayaran ' . $reg->invoice_number . ' berhasil dilewati. Tiket telah dikirim ke email.');
     }
 }

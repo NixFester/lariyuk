@@ -153,7 +153,7 @@ class EventController extends Controller
 
     private function syncCategories(Request $request, Event $event): void
     {
-        $event->categories()->delete();
+        $updatedIds = [];
 
         foreach ($request->input('categories', []) as $cat) {
             $normalPrice = (int) $cat['normal_price'];
@@ -162,14 +162,23 @@ class EventController extends Controller
                 : null;
             $limit = isset($cat['limit']) && $cat['limit'] ? (int) $cat['limit'] : 200;
 
-            EventCategory::create([
-                'event_id'          => $event->id,
-                'name'              => $cat['name'],
-                'normal_price'      => $normalPrice,
-                'early_bird_price'  => $earlyBird,
-                'limit'             => $limit,
-            ]);
+            $category = EventCategory::updateOrCreate(
+                ['event_id' => $event->id, 'name' => $cat['name']],
+                [
+                    'normal_price'     => $normalPrice,
+                    'early_bird_price' => $earlyBird,
+                    'limit'            => $limit,
+                ]
+            );
+
+            $updatedIds[] = $category->id;
         }
+
+        // Delete categories that are not in the updated list and have no registrations
+        $event->categories()
+            ->whereNotIn('id', $updatedIds)
+            ->whereDoesntHave('registrations')
+            ->delete();
     }
 
     private function syncHighlights(Request $request, Event $event): void

@@ -32,9 +32,10 @@
   </div>
 @endif
 
+
 <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
   <div class="px-5 py-3 border-b border-gray-100 text-sm text-slate-500">
-    <strong>{{ $registrations->total() }}</strong> pendaftar menunggu verifikasi pembayaran
+    <strong>{{ $registrations->total() }}</strong> pendaftar menunggu verifikasi pembayaran (WA dikonfirmasi)
   </div>
 
   @if($registrations->count() > 0)
@@ -95,5 +96,63 @@
     </div>
   @endif
 </div>
+
+{{-- Pending Registrations without WA Confirmation --}}
+@if($pendingRegistrations->count() > 0)
+<div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
+  <div class="px-5 py-3 border-b border-gray-100 text-sm text-slate-500">
+    <strong>{{ $pendingRegistrations->total() }}</strong> pendaftar menunggu konfirmasi WhatsApp
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead><tr class="bg-gray-50 text-left">
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Nickname (BIB)</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Nama Peserta</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Email</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Event / Kategori</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Total</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Dibuat</th>
+        <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Aksi</th>
+      </tr></thead>
+      <tbody class="divide-y divide-gray-100">
+        @foreach($pendingRegistrations as $r)
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-mono font-bold text-orange-600 text-sm">{{ $r->nickname }}</td>
+            <td class="px-4 py-3">
+              <p class="font-semibold text-slate-900">{{ $r->nama_peserta }}</p>
+              <p class="text-xs text-slate-400 font-mono">{{ $r->no_ktp }}</p>
+            </td>
+            <td class="px-4 py-3 text-slate-700 text-xs">{{ $r->email }}</td>
+            <td class="px-4 py-3">
+              <p class="text-slate-700 text-xs leading-tight">{{ $r->event?->title }}</p>
+              <span class="inline-block mt-1 px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-xs font-medium">{{ $r->category?->name }}</span>
+            </td>
+            <td class="px-4 py-3 font-medium text-slate-900">Rp {{ number_format($r->total,0,',','.') }}</td>
+            <td class="px-4 py-3 text-slate-500 text-xs">{{ $r->created_at?->translatedFormat('d/m H:i') }}</td>
+            <td class="px-4 py-3">
+              <form action="{{ route('admin.registrations.skip-payment', $r->id) }}" method="POST" onsubmit="return confirm('Lewati pembayaran untuk {{ $r->invoice_number }}?')" class="inline">
+                @csrf
+                <button type="submit" class="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-700 text-xs font-semibold rounded-lg transition-colors">
+                  ✓ Verifikasi
+                </button>
+              </form>
+              <a href="{{ route('admin.registrations.show', $r->id) }}" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-medium rounded-lg transition-colors inline-block ml-2">Detail</a>
+            </td>
+          </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
+
+  {{-- Pagination --}}
+  @if($pendingRegistrations->lastPage() > 1)
+    <div class="px-5 py-4 border-t border-gray-100">
+      {{ $pendingRegistrations->links() }}
+    </div>
+  @endif
+</div>
+@endif
+
 
 @endsection

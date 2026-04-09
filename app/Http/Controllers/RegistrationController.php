@@ -544,4 +544,135 @@ class RegistrationController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Show re-registration form with token validation
+     * Used for users whose registrations were deleted due to system error
+     */
+    public function showReregister(string $token)
+    {
+        $apologyToken = \App\Models\ApologyToken::where('token', $token)->firstOrFail();
+
+        if (!$apologyToken->isValid()) {
+            return redirect()->route('home')
+                ->with('error', 'Link registrasi ulang telah kadaluarsa atau sudah digunakan. Silakan hubungi support kami.');
+        }
+
+        $email = $apologyToken->email;
+        $events = \App\Models\Event::with('categories')
+            ->where('is_active', true)
+            ->orderBy('date')
+            ->get();
+
+        $eventData = $events->map(function ($event) {
+            return [
+                'id' => $event->id,
+                'categories' => $event->categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'price' => number_format($category->active_price, 0, ',', '.'),
+                    ];
+                })->values()->toArray(),
+            ];
+        })->toArray();
+
+        return view('checkout.reregister', compact('token', 'email', 'events', 'eventData'));
+    }
+
+    /**
+     * Handle re-registration form submission
+     * Does NOT increment the registered counter (treats as original registration)
+     */
+    public function storeReregister(Request $request, string $token)
+    {
+        $apologyToken = \App\Models\ApologyToken::where('token', $token)->firstOrFail();
+
+        if (!$apologyToken->isValid()) {
+            return redirect()->route('home')
+                ->with('error', 'Link registrasi ulang telah kadaluarsa atau sudah digunakan.');
+        }
+
+        $data = $request->validate([
+            'event_id'            => 'required|exists:events,id',
+            'event_category_id'   => 'required|exists:event_categories,id',
+            'email'               => 'required|email',
+            'no_ktp'              => 'required|digits:16',
+            'nama_peserta'        => 'required|string|max:150',
+            'nickname'            => 'required|string|max:30',
+            'phone'               => 'required|string|max:20',
+            'tanggal_lahir'       => 'required|date',
+            'jenis_kelamin'       => 'required|in:L,P',
+            'ukuran_kaos'         => 'required|in:XXS,XS,XS-sport,S,S-sport,M,M-sport,L,L-sport,XL,XL-sport,2XL,2XL-sport,3XL,3XL-sport,4XL,4XL-sport',
+            'golongan_darah'      => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'kontak_darurat_nama' => 'required|string|max:150',
+            'kontak_darurat_hp'   => 'required|string|max:20',
+        ]);
+
+        $category = \App\Models\EventCategory::where('id', $data['event_category_id'])
+            ->where('event_id', $data['event_id'])
+            ->first();
+
+        if (!$category) {
+            return redirect()->back()
+                ->withErrors(['event_category_id' => 'Kategori tidak valid untuk event yang dipilih.'])
+                ->withInput();
+        }
+
+        // Normalize phone numbers
+        $data['phone'] = $this->normalizePhoneNumber($data['phone']);
+        $data['kontak_darurat_hp'] = $this->normalizePhoneNumber($data['kontak_darurat_hp']);
+
+        // Create registration without incrementing event counter
+        // This is a special re-registration for users whose data was deleted
+        $registration = DB::transaction(function () use ($data, $apologyToken, $category) {
+            $reg = Registration::create([
+                ...$data,
+                'event_id'           => $data['event_id'],
+                'event_category_id'  => $data['event_category_id'],
+                'invoice_number'     => Registration::generateInvoice(),
+                'payment_status'     => 'paid',
+                'is_early_bird'      => false,
+                'subtotal'           => $category->active_price,
+                'admin_fee'          => 0,
+                'total'              => $category->active_price,
+                'payment_verified_at'=> now(),
+                'ticket_email_sent'  => false,
+            ]);
+
+            // Mark token as used
+            $apologyToken->markAsUsed();
+
+            return $reg;
+        });
+
+        // Cache and send confirmation email
+        Cache::put(
+            'registration_' . $registration->id,
+            [
+                'invoice_number' => $registration->invoice_number,
+                'nama_peserta' => $registration->nama_peserta,
+                'email' => $registration->email,
+                'phone' => $registration->phone,
+                'payment_status' => $registration->payment_status,
+            ],
+            now()->addHours(24)
+        );
+
+        // Send success notification (admin should create proper registration)
+        return redirect()->route('checkout.reregister.success', $registration->invoice_number)
+            ->with('success', 'Registrasi ulang berhasil! Tim admin akan segera memproses data Anda.');
+    }
+
+    /**
+     * Show success page for re-registration
+     */
+    public function reregisterSuccess(string $invoice)
+    {
+        $registration = Registration::where('invoice_number', $invoice)
+            ->where('payment_status', 'paid')
+            ->firstOrFail();
+
+        return view('checkout.reregister-success', compact('registration'));
+    }
 }
