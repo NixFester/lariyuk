@@ -47,43 +47,35 @@ class RegistrationController extends Controller
 
         $price       = $category->active_price;
         $isEarlyBird = $event->is_early_bird_active;
-        $adminFee    = 5000;
+        $adminFee    = 0;
         $total       = $price + $adminFee;
 
         $shirtSizes = [
             'XXS' => [
-                'normal' => ['width' => '46', 'length' => '60'],
+                'default' => ['width' => '46', 'length' => '60'],
             ],
             'XS' => [
-                'normal' => ['width' => '48', 'length' => '62'],
                 'sport' => ['width' => '46', 'length' => '60'],
             ],
             'S' => [
-                'normal' => ['width' => '50', 'length' => '65'],
                 'sport' => ['width' => '48', 'length' => '62'],
             ],
             'M' => [
-                'normal' => ['width' => '52', 'length' => '68'],
                 'sport' => ['width' => '50', 'length' => '65'],
             ],
             'L' => [
-                'normal' => ['width' => '54', 'length' => '70'],
                 'sport' => ['width' => '52', 'length' => '68'],
             ],
             'XL' => [
-                'normal' => ['width' => '56', 'length' => '72'],
                 'sport' => ['width' => '54', 'length' => '70'],
             ],
             '2XL' => [
-                'normal' => ['width' => '58', 'length' => '74'],
                 'sport' => ['width' => '56', 'length' => '72'],
             ],
             '3XL' => [
-                'normal' => ['width' => '60', 'length' => '78'],
                 'sport' => ['width' => '58', 'length' => '74'],
             ],
             '4XL' => [
-                'normal' => ['width' => '62', 'length' => '80'],
                 'sport' => ['width' => '60', 'length' => '78'],
             ],
         ];
@@ -106,7 +98,7 @@ class RegistrationController extends Controller
             'phone'               => 'required|string|max:20',
             'tanggal_lahir'       => 'required|date',
             'jenis_kelamin'       => 'required|in:L,P',
-            'ukuran_kaos'         => 'required|in:XXS,XS,XS-sport,S,S-sport,M,M-sport,L,L-sport,XL,XL-sport,2XL,2XL-sport,3XL,3XL-sport,4XL,4XL-sport',
+            'ukuran_kaos'         => 'required|in:XXS,XS-sport,S-sport,M-sport,L-sport,XL-sport,2XL-sport,3XL-sport,4XL-sport',
             'golongan_darah'      => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
             'kontak_darurat_nama' => 'required|string|max:150',
             'kontak_darurat_hp'   => 'required|string|max:20',
@@ -129,7 +121,7 @@ class RegistrationController extends Controller
 
         $isEarlyBird = $event->is_early_bird_active;
         $price       = $category->active_price;
-        $adminFee    = 5000;
+        $adminFee    = 0;
         $total       = $price + $adminFee;
 
         $registration = DB::transaction(function () use ($data, $event, $isEarlyBird, $price, $adminFee, $total) {

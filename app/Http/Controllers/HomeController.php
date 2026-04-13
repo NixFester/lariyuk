@@ -10,7 +10,6 @@ class HomeController extends Controller
     public function index()
     {
         $events = Event::with(['categories', 'highlights'])
-            ->where('is_active', true)
             ->orderBy('date')
             ->paginate(9);
 

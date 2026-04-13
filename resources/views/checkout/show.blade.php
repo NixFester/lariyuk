@@ -123,15 +123,14 @@
                   $sizeOptions = ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
                 @endphp
                 @foreach($sizeOptions as $size)
-                  {{-- Normal variant --}}
-                  <label class="cursor-pointer">
-                    <input type="radio" name="ukuran_kaos" value="{{ $size }}" class="sr-only peer" {{ old('ukuran_kaos')==$size ? 'checked' : '' }} required>
-                    <span class="block px-3 py-2 border-2 border-gray-200 rounded-lg text-xs font-semibold text-slate-600 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 transition-colors">{{ $size }}<span class="hidden sm:inline text-gray-400"> Normal</span></span>
-                  </label>
-                  {{-- Sport variant (not for XXS) --}}
-                  @if($size !== 'XXS')
+                  @if($size === 'XXS')
                     <label class="cursor-pointer">
-                      <input type="radio" name="ukuran_kaos" value="{{ $size }}-sport" class="sr-only peer" {{ old('ukuran_kaos')==$size.'-sport' ? 'checked' : '' }}>
+                      <input type="radio" name="ukuran_kaos" value="{{ $size }}" class="sr-only peer" {{ old('ukuran_kaos') == $size ? 'checked' : '' }} required>
+                      <span class="block px-3 py-2 border-2 border-gray-200 rounded-lg text-xs font-semibold text-slate-600 peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 hover:border-gray-300 transition-colors">{{ $size }}</span>
+                    </label>
+                  @else
+                    <label class="cursor-pointer">
+                      <input type="radio" name="ukuran_kaos" value="{{ $size }}-sport" class="sr-only peer" {{ old('ukuran_kaos') == "{$size}-sport" ? 'checked' : '' }} required>
                       <span class="block px-3 py-2 border-2 border-gray-200 rounded-lg text-xs font-semibold text-slate-600 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-700 hover:border-gray-300 transition-colors">{{ $size }}<span class="hidden sm:inline text-gray-400"> Sport</span></span>
                     </label>
                   @endif

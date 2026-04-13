@@ -91,22 +91,22 @@
             <tbody class="divide-y divide-gray-100">
               @php
                 $shirtSizes = [
-                  'XXS' => ['normal' => ['width' => '46', 'length' => '60']],
-                  'XS' => ['normal' => ['width' => '48', 'length' => '62'], 'sport' => ['width' => '46', 'length' => '60']],
-                  'S' => ['normal' => ['width' => '50', 'length' => '65'], 'sport' => ['width' => '48', 'length' => '62']],
-                  'M' => ['normal' => ['width' => '52', 'length' => '68'], 'sport' => ['width' => '50', 'length' => '65']],
-                  'L' => ['normal' => ['width' => '54', 'length' => '70'], 'sport' => ['width' => '52', 'length' => '68']],
-                  'XL' => ['normal' => ['width' => '56', 'length' => '72'], 'sport' => ['width' => '54', 'length' => '70']],
-                  '2XL' => ['normal' => ['width' => '58', 'length' => '74'], 'sport' => ['width' => '56', 'length' => '72']],
-                  '3XL' => ['normal' => ['width' => '60', 'length' => '78'], 'sport' => ['width' => '58', 'length' => '74']],
-                  '4XL' => ['normal' => ['width' => '62', 'length' => '80'], 'sport' => ['width' => '60', 'length' => '78']],
+                  'XXS' => ['default' => ['width' => '46', 'length' => '60']],
+                  'XS' => ['sport' => ['width' => '46', 'length' => '60']],
+                  'S' => ['sport' => ['width' => '48', 'length' => '62']],
+                  'M' => ['sport' => ['width' => '50', 'length' => '65']],
+                  'L' => ['sport' => ['width' => '52', 'length' => '68']],
+                  'XL' => ['sport' => ['width' => '54', 'length' => '70']],
+                  '2XL' => ['sport' => ['width' => '56', 'length' => '72']],
+                  '3XL' => ['sport' => ['width' => '58', 'length' => '74']],
+                  '4XL' => ['sport' => ['width' => '60', 'length' => '78']],
                 ];
               @endphp
               @foreach($shirtSizes as $size => $variants)
                 @foreach($variants as $variant => $dims)
                   <tr class="hover:bg-gray-50">
                     <td class="py-3 font-bold text-primary-600">{{ $size }}</td>
-                    <td class="py-3 text-slate-600">{{ ucfirst($variant) }}</td>
+                    <td class="py-3 text-slate-600">{{ $variant === 'default' ? '-' : ucfirst($variant) }}</td>
                     <td class="py-3 text-slate-600">{{ $dims['width'] }}</td>
                     <td class="py-3 text-slate-600">{{ $dims['length'] }}</td>
                   </tr>

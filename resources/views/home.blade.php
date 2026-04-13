@@ -46,153 +46,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @foreach($events as $event)
-        <div class="bg-white rounded-2xl POSTRedirect Payment (iPaymu Payment Page)
-https://sandbox.ipaymu.com/api/v2/payment
-
-Pembayaran menggunakan halaman pembayaran iPaymu. Integrasi yang sangat mudah, tanpa membuat halaman pembayaran lagi.
-HEADERS
-Content-Type
-
-application/json
-signature
-
-Signature generate per-request. Read more https://storage.googleapis.com/ipaymu-docs/ipaymu-api/iPaymu-signature-documentation-v2.pdf
-va
-
-1179000899
-timestamp
-
-2026-04-01T07:07:46.866Z
-Bodyformdata
-product[]
-
-T-Shirt
-
-Product
-qty[]
-
-2
-
-Quantity
-price[]
-
-51000
-
-Price on IDR
-description[]
-
-Size XL
-
-Description
-imageUrl[]
-
-https://demo.ipaymu.com/assets/images/product-7.jpg
-
-Product image url (optional)
-weight[]
-
-0.5
-
-Product weight in kg (optional, for COD payment)
-length[]
-
-1
-
-Product length in cm (optional, for COD payment)
-width[]
-
-1
-
-Product width in cm (optional, for COD payment)
-height[]
-
-1
-
-Product height in cm (optional, for COD payment)
-referenceId
-
-ID1234
-
-Reference/transaction ID merchant (optional)
-returnUrl
-
-https://your-website.com/thank-you-page
-
-Thank you page
-notifyUrl
-
-https://webhook.site/caef335b-f0bf-49d3-a532-35564f5241a2
-
-Notify URL for receive webhook from iPaymu. (iPaymu will send param in POST method to this URL when buyer make a payment)
-cancelUrl
-
-https://your-website.com/failed-page
-
-Cancel/failed page
-buyerName
-
-putu
-
-Buyer name (optional)
-buyerEmail
-
-putu@mail.com
-
-Buyer email (optional)
-buyerPhone
-
-08123456789
-
-Buyer phone (optional)
-expired
-
-24
-
-Custom expired payment code in hours (optional) Nb:
-
-    BSI VA max 3 hours
-    BCA VA can't be customized (default 12 hours)
-    BRI VA max 2 hours
-    Con Store Alfamart can't be customized (default 24 hours)
-    QRIS can't be customized (default 5 minutes)
-
-feeDirection
-
-MERCHANT
-
-Custom fee direction (optional)
-
-    MERCHANT => fee charged to merchant,
-    BUYER => fee charged to buyer
-
-account
-
-1179000899
-
-va child account (optional)
-paymentMethod
-
-cc
-
-Customize the payment payment method that appears on the payment page (optional)
-
-    Virtual Account => 'va'
-    Bank Transfer => 'banktransfer'
-    Convenience Store => 'cstore'
-    COD => 'cod'
-    QRIS => 'qris'
-    Credit Card => 'cc'
-
-pickupArea
-
-17473
-
-Delivery postal code (for COD payment) (optional)
-lang
-
-id
-
-Payment page languageoverflow-hidden border border-gray-200 card-hover">
+        <div class="relative bg-white rounded-2xl overflow-hidden border border-gray-200 card-hover {{ $event->is_active ? '' : 'bg-gray-100 border-gray-300 opacity-80' }}">
           <div class="relative">
             <img src="{{ $event->image_url }}" alt="{{ $event->title }}" class="w-full h-48 object-cover">
             <div class="absolute top-3 left-3">
@@ -208,6 +62,11 @@ Payment page languageoverflow-hidden border border-gray-200 card-hover">
                 <span class="px-2.5 py-1 bg-yellow-400 text-slate-900 text-xs font-medium rounded-full ml-1">Early Bird</span>
               @endif
             </div>
+            @unless($event->is_active)
+              <div class="absolute inset-0 bg-slate-900/60 flex items-center justify-center text-center px-4">
+                <span class="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white">Pendaftaran Ditutup Sementara</span>
+              </div>
+            @endunless
           </div>
           <div class="p-5">
             <h3 class="font-display font-bold text-slate-900 mb-1 truncate">{{ $event->title }}</h3>
