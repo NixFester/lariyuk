@@ -27,6 +27,15 @@
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
     Export CSV
   </a>
+  <a href="{{ route('admin.registrations.export-paid-customers') }}" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-slate-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-4.418 0-8 1.79-8 4v1h16v-1c0-2.21-3.582-4-8-4z"/></svg>
+    Export Pelanggan Lunas
+  </a>
+  {{-- export as a text --}}
+  <a href="{{ route('admin.registrations.export-paid-customers-as-text') }}" class="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-slate-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-2">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM12 14c-4.418 0-8 1.79-8 4v1h16v-1c0-2.21-3.582-4-8-4z"/></svg>
+    Export Pelanggan Lunas (TXT)
+  </a>
 </div>
 
 {{-- Recent Registrations --}}

@@ -99,6 +99,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', [AdminEventController::class, 'dashboard'])->name('dashboard');
 
+        // event export
+        Route::get('/registrations/event/{eventId}/export-excel', [AdminRegistrationController::class, 'exportToExcel'])->name('registrations.export-excel');
         // Event CRUD
         Route::resource('events', AdminEventController::class)->except(['show']);
 
@@ -111,6 +113,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/registrations/{id}/verify-payment', [AdminRegistrationController::class, 'verifyPayment'])->name('registrations.verify-payment');
         Route::post('/registrations/{id}/skip-payment', [AdminRegistrationController::class, 'skipPayment'])->name('registrations.skip-payment');
         Route::get('/registrations/export', [AdminRegistrationController::class, 'export'])->name('registrations.export');
+        Route::get('/registrations/export-data-for-paid-customers', [AdminRegistrationController::class, 'exportDataForPaidCustomers'])->name('registrations.export-paid-customers');
+        Route::get('/registrations/export-paid-customers-as-text', [AdminRegistrationController::class, 'exportPaidCustomersAsText'])->name('registrations.export-paid-customers-as-text');
         Route::delete('/registrations/{id}', [AdminRegistrationController::class, 'destroy'])->name('registrations.destroy');
         Route::get('/registrations/{id}', [AdminRegistrationController::class, 'show'])->name('registrations.show');
 

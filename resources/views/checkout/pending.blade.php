@@ -123,7 +123,7 @@
                     class="flex flex-col items-center justify-center gap-2 p-4 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all cursor-pointer group"
                     onclick="openPaymentModal({{ $method->id }})">
               @if($method->name === 'QRIS')
-                <img src="{{ asset('Logo_QRIS.svg') }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">
+                <!--<img src="{{ asset('Logo_QRIS.svg') }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">-->
               @elseif($method->icon)
                 <img src="{{ asset('storage/' . $method->icon) }}" alt="{{ $method->name }}" class="w-10 h-10 object-contain">
               @else
@@ -143,7 +143,7 @@
           @php
             $waNumber = config('app.whatsapp_number');
             $verifyLink = route('checkout.verify', $registration->invoice_number, true); // Absolute URL
-            $waMessage = "Halo, saya telah menyelesaikan pembayaran untuk invoice: " . $registration->invoice_number . " Nama: " . $registration->nama_peserta . " Silakan klik link berikut untuk memverifikasi pembayaran (login terlebih dahulu jika belum): " . $verifyLink;
+            $waMessage = "Halo, saya telah menyelesaikan pembayaran untuk invoice: " . $registration->invoice_number . " Nama: " . $registration->nama_peserta ;
             $waLink = "https://wa.me/{$waNumber}?text=" . urlencode($waMessage);
           @endphp
           
@@ -189,9 +189,9 @@
 
     {{-- Payment Details --}}
     @if($method->name === 'QRIS')
-      <div class="bg-slate-50 rounded-xl p-6 mb-6 flex justify-center">
+      <!-- <div class="bg-slate-50 rounded-xl p-6 mb-6 flex justify-center">
         <img src="{{ asset('storage/' . $method->icon) }}" alt="QRIS Code" class="w-full h-full object-contain">
-      </div>
+      </div> -->
     @else
     <p class="text-slate-500 text-sm mb-6">{{ $method->description }}</p>
       <div class="mb-6 p-4 bg-gray-100 rounded-xl">
@@ -201,7 +201,7 @@
 
       @if($method->display_number)
         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p class="text-xs font-semibold text-blue-900 mb-1">NOMOR/AKUN:</p>
+          <p class="text-xs font-semibold text-blue-900 mb-1">NOMOR REKENING:</p>
           <p class="text-lg font-bold text-blue-600 font-mono">{{ $method->display_number }}</p>
         </div>
       @endif
