@@ -127,8 +127,12 @@
     {{-- QR / Invoice section --}}
     <div class="bg-white border-t border-dashed border-gray-200 px-7 py-5 flex items-center gap-6">
       {{-- QR Code --}}
-      <div class="w-20 h-20 flex-shrink-0 rounded-lg flex items-center justify-center bg-white">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode($registration->invoice_number) }}" alt="QR Code" class="w-20 h-20 rounded">
+      <div class="w-40 h-40 flex-shrink-0 rounded-lg flex items-center justify-center bg-white">
+      <img 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode(config('app.url') . '/admin/racepack/' . $registration->invoice_number) }}" 
+          alt="QR Code" 
+          class="w-40 h-40"
+      >        
       </div>
       <div>
         <p class="text-xs text-slate-400 mb-1">Tunjukkan kode ini saat pengambilan race pack</p>

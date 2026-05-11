@@ -15,13 +15,14 @@ class Registration extends Model
         'subtotal', 'admin_fee', 'total', 'is_early_bird',
         'ticket_email_sent', 'qris_displayed_at', 'whatsapp_confirmed_at',
         'payment_verified_at', 'ipaymu_transaction_id', 'ipaymu_paid_at',
-        'midtrans_transaction_id', 'midtrans_paid_at',
+        'midtrans_transaction_id', 'midtrans_paid_at', 'is_taken',
     ];
 
     protected $casts = [
         'tanggal_lahir'       => 'date',
         'is_early_bird'       => 'boolean',
         'ticket_email_sent'   => 'boolean',
+        'is_taken'            => 'boolean',
         'qris_displayed_at'   => 'datetime',
         'whatsapp_confirmed_at' => 'datetime',
         'payment_verified_at' => 'datetime',

@@ -40,6 +40,8 @@ return new class extends Migration
 
             // Ticket email sent flag
             $table->boolean('ticket_email_sent')->default(false);
+            $table->boolean('is_taken')->default(false);
+
 
             $table->timestamps();
         });

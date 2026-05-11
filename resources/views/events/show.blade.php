@@ -22,6 +22,16 @@
     </div>
   </div>
 
+  <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="space-y-2">
+      <p class="text-sm text-slate-200">Temukan nama Anda di daftar peserta yang sudah terbayar.</p>
+      <p class="text-sm text-slate-200">Klik tombol berikut untuk membuka kartu pendaftaran Anda.</p>
+    </div>
+    <a href="{{ route('event.paid-list', $event->id) }}" class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-semibold text-primary-700 shadow-sm shadow-slate-900/5 hover:bg-slate-50 transition">
+      Lihat Daftar Peserta Sudah Bayar
+    </a>
+  </div>
+
   <div class="grid lg:grid-cols-3 gap-8">
     {{-- Left: Info --}}
     <div class="lg:col-span-2 space-y-6">

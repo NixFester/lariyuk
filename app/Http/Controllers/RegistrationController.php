@@ -263,6 +263,18 @@ class RegistrationController extends Controller
         return view('checkout.success', compact('registration'));
     }
 
+    /** Participant-facing list of paid registrations for an event */
+    public function eventPaidList(Event $event)
+    {
+        $registrations = $event->registrations()
+            ->where('payment_status', 'paid')
+            ->with('category')
+            ->orderBy('nama_peserta')
+            ->get(['id', 'event_id', 'event_category_id', 'invoice_number', 'nama_peserta', 'nickname']);
+
+        return view('checkout.event-paid-list', compact('event', 'registrations'));
+    }
+
     //**workaround from midtrans */
     /** Success / ticket display page workaround */
     public function successmidtrans(string $invoice)

@@ -447,7 +447,7 @@ public function exportToExcel(string $eventId)
     // Write registration data
     $row = 2;
     foreach ($registrations as $index => $r) {
-        $sheet1->getCell('A' . $row)->setValue($index + 1);
+        $sheet1->getCell('A' . $row)->setValue($index + 10001);
         $sheet1->getCell('B' . $row)->setValue($r->invoice_number);
         $sheet1->getCell('C' . $row)->setValue($r->nickname ?? '-');
         $sheet1->getCell('D' . $row)->setValue($r->nama_peserta);

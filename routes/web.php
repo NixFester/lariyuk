@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\EventController as AdminEventController;
 use App\Http\Controllers\Admin\RegistrationController as AdminRegistrationController;
 use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\RacepackController;
 use App\Http\Controllers\MidtransPlaygroundController;
 
 // midtrans playground routes
@@ -29,6 +30,10 @@ Route::prefix('events')->name('events.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
     Route::get('/{slug}', [EventController::class, 'show'])->name('show');
 });
+
+// Participant-facing paid registration list for each event
+Route::get('/event/{event}/list', [RegistrationController::class, 'eventPaidList'])->name('event.paid-list');
+
 Route::prefix('checkout')->name('checkout.')->group(function () {
     // Static/specific routes MUST be declared before wildcard routes
     Route::get('/pending/{invoice}', [RegistrationController::class, 'pending'])->name('pending');
@@ -129,6 +134,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/regenerate-expired', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'regenerateExpired'])->name('regenerate-expired');
             Route::get('/{token}', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'show'])->name('show');
             Route::post('/{token}/send', [\App\Http\Controllers\Admin\ApologyEmailController::class, 'sendOne'])->name('send-one');
+        });
+
+        // Racepack Monitor
+        Route::prefix('racepack')->name('racepack.')->group(function () {
+            Route::get('/monitor', [RacepackController::class, 'monitor'])->name('monitor');
+            Route::get('/{invoice}', [RacepackController::class, 'markAsTaken'])->name('mark-taken');
         });
     });
 });
