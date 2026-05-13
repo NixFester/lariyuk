@@ -64,7 +64,7 @@
             </div>
             @unless($event->is_active)
               <div class="absolute inset-0 bg-slate-900/60 flex items-center justify-center text-center px-4">
-                <span class="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white">Pendaftaran Ditutup Sementara</span>
+                <span class="rounded-full bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-[0.12em] text-white">Pendaftaran Ditutup</span>
               </div>
             @endunless
           </div>

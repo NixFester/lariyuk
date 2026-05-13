@@ -110,6 +110,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('events', AdminEventController::class)->except(['show']);
 
         // Registrations
+        Route::get('/registrations/create', [AdminRegistrationController::class, 'create'])->name('registrations.create');
+        Route::post('/registrations', [AdminRegistrationController::class, 'store'])->name('registrations.store');
         Route::get('/registrations', [AdminRegistrationController::class, 'index'])->name('registrations.index');
         Route::get('/registrations/event/{eventId}', [AdminRegistrationController::class, 'byEvent'])->name('registrations.by-event');
         Route::get('/registrations/event/{eventId}/category/{categoryId}', [AdminRegistrationController::class, 'byCategory'])->name('registrations.by-category');

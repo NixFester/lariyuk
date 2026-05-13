@@ -4,10 +4,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Registration;
 use App\Models\Event;
+use App\Models\EventCategory;
+use App\Models\Registration;
 use App\Mail\TicketMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -36,6 +38,98 @@ class RegistrationController extends Controller
         }])->orderBy('title')->get();
 
         return view('admin.registrations.index', compact('events'), ['singleEvent' => false]);
+    }
+
+    public function create()
+    {
+        $events = Event::with('categories')->orderBy('title')->get();
+        
+        // Prepare events data for JavaScript
+        $eventsData = $events->map(function ($event) {
+            return [
+                'id' => $event->id,
+                'title' => $event->title,
+                'categories' => $event->categories->map(function ($category) {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                    ];
+                })->toArray(),
+            ];
+        })->toArray();
+        
+        return view('admin.registrations.create', compact('events', 'eventsData'));
+    }
+
+    private function normalizePhoneNumber(string $phone): string
+    {
+        $phone = trim(preg_replace('/\s+/', '', $phone));
+
+        if (str_starts_with($phone, '+62')) {
+            return $phone;
+        }
+
+        if (str_starts_with($phone, '08')) {
+            return '+62' . substr($phone, 1);
+        }
+
+        return $phone;
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'event_id'            => 'required|exists:events,id',
+            'event_category_id'   => 'required|exists:event_categories,id',
+            'no_ktp'              => 'required|digits:16',
+            'nama_peserta'        => 'required|string|max:150',
+            'nickname'            => 'required|string|max:30',
+            'email'               => 'required|email',
+            'phone'               => 'required|string|max:20',
+            'tanggal_lahir'       => 'required|date',
+            'jenis_kelamin'       => 'required|in:L,P',
+            'ukuran_kaos'         => 'required|in:XXS,XS-sport,S-sport,M-sport,L-sport,XL-sport,2XL-sport,3XL-sport,4XL-sport',
+            'golongan_darah'      => 'required|in:A,B,AB,O,A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'kontak_darurat_nama' => 'required|string|max:150',
+            'kontak_darurat_hp'   => 'required|string|max:20',
+        ]);
+
+        $event = Event::findOrFail($data['event_id']);
+        $category = EventCategory::where('id', $data['event_category_id'])
+            ->where('event_id', $event->id)
+            ->firstOrFail();
+
+        if (!$category->hasAvailableSlots()) {
+            return redirect()->back()
+                ->with('error', 'Kuota kategori ' . $category->name . ' sudah penuh.')
+                ->withInput();
+        }
+
+        $data['phone'] = $this->normalizePhoneNumber($data['phone']);
+        $data['kontak_darurat_hp'] = $this->normalizePhoneNumber($data['kontak_darurat_hp']);
+
+        $price = $category->active_price;
+        $adminFee = 0;
+        $total = $price + $adminFee;
+
+        $registration = DB::transaction(function () use ($data, $event, $price, $adminFee, $total) {
+            $reg = Registration::create([
+                ...$data,
+                'invoice_number' => Registration::generateInvoice(),
+                'payment_status' => 'paid',
+                'is_early_bird'  => $event->is_early_bird_active,
+                'subtotal'       => $price,
+                'admin_fee'      => $adminFee,
+                'total'          => $total,
+            ]);
+
+            $event->increment('registered');
+
+            return $reg;
+        });
+
+        return redirect()->route('admin.registrations.create')
+            ->with('success', 'Data pendaftar berhasil ditambahkan. Invoice: ' . $registration->invoice_number);
     }
 
     /**
@@ -433,7 +527,7 @@ public function exportToExcel(string $eventId)
 
     // Headers
     $headers = [
-        'No', 'Invoice', 'Nickname (BIB)', 'Nama Peserta', 'No. KTP', 'Email', 'No. HP',
+        'No BIB', 'Invoice', 'Nickname (BIB)', 'Nama Peserta', 'No. KTP', 'Email', 'No. HP',
         'Tgl Lahir', 'Jenis Kelamin', 'Golongan Darah', 'Ukuran Kaos', 'Kategori',
         'Kontak Darurat', 'HP Darurat'
     ];

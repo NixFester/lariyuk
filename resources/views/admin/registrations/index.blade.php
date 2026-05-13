@@ -5,6 +5,9 @@
 <div class="space-y-4">
   <div class="flex items-center justify-between mb-6">
     <h1 class="text-2xl font-bold text-slate-900">Daftar Pendaftar</h1>
+    <a href="{{ route('admin.registrations.create') }}" class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-slate-900/5 hover:bg-green-700 transition">
+      Tambah Pendaftar
+    </a>
   </div>
 
   @if($events->isEmpty())
