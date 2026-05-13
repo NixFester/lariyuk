@@ -514,9 +514,10 @@ public function exportToExcel(string $eventId)
 {
     $event = Event::findOrFail($eventId);
     $registrations = Registration::where('event_id', $eventId)
-                            ->where('payment_status', 'paid')
-                            ->with(['event', 'category'])
-                            ->get();
+    ->where('payment_status', 'paid')
+    ->orderBy('id')
+    ->with(['event', 'category'])
+    ->get();
 
     // Create spreadsheet
     $spreadsheet = new Spreadsheet();

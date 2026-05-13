@@ -4,7 +4,7 @@
 
 <div class="mb-8">
     <h1 class="font-display font-bold text-3xl text-slate-900 mb-2">Monitoring Pengambilan Racepack</h1>
-    <p class="text-slate-600">Scan QR code atau masukkan invoice untuk menandai racepack sebagai diambil</p>
+    <p class="text-slate-600">Scan QR code atau masukkan invoice untuk melihat detail dan mengonfirmasi pengambilan racepack</p>
 </div>
 
 {{-- Success Message --}}
@@ -22,12 +22,6 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     {{-- QR Scanner Section --}}
     <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-200 overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h2 class="font-display font-bold text-slate-800">Scanner QR Code</h2>
-            <button onclick="toggleScanner()" id="scannerToggleBtn" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
-                Buka Kamera
-            </button>
-        </div>
         
         <div class="p-6">
             <div id="scannerContainer" class="hidden">
@@ -37,7 +31,7 @@
             
             {{-- Manual Input --}}
             <div class="mt-6 pt-6 border-t border-gray-100">
-                <label class="block text-sm font-medium text-slate-700 mb-2">Atau Masukkan No. Invoice Secara Manual</label>
+                <label class="block text-sm font-medium text-slate-700 mb-2">Masukkan No. Invoice Secara Manual</label>
                 <div class="flex gap-2">
                     <input 
                         type="text" 
@@ -206,7 +200,7 @@
     }
 
     function submitInvoiceDirectly(invoice) {
-        // Navigate to the mark as taken route
+        // Navigate to the racepack detail page for confirmation
         window.location.href = `{{ url('admin/racepack') }}/${invoice}`;
     }
 

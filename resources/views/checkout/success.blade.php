@@ -129,7 +129,7 @@
       {{-- QR Code --}}
       <div class="w-40 h-40 flex-shrink-0 rounded-lg flex items-center justify-center bg-white">
       <img 
-          src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode(config('app.url') . '/admin/racepack/' . $registration->invoice_number) }}" 
+          src="https://api.qrserver.com/v1/create-qr-code/?size=80x80&data={{ urlencode(config('app.url') . 'admin/racepack/' . $registration->invoice_number) }}" 
           alt="QR Code" 
           class="w-40 h-40"
       >        

@@ -141,7 +141,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Racepack Monitor
         Route::prefix('racepack')->name('racepack.')->group(function () {
             Route::get('/monitor', [RacepackController::class, 'monitor'])->name('monitor');
-            Route::get('/{invoice}', [RacepackController::class, 'markAsTaken'])->name('mark-taken');
+            Route::get('/{invoice}', [RacepackController::class, 'show'])->name('show');
+            Route::post('/{invoice}/confirm', [RacepackController::class, 'confirm'])->name('confirm');
         });
     });
 });
